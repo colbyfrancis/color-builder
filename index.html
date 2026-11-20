@@ -4,12 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Color Studio</title>
+  <script>
+    if (new URLSearchParams(window.location.search).get("embed") === "1") {
+      document.documentElement.classList.add("is-embedded");
+    }
+  </script>
   <style>
     :root {
       color-scheme: light;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #252522;
-      background: #f5f3ef;
+      background: #f5f5f5;
     }
 
     * { box-sizing: border-box; }
@@ -23,13 +28,30 @@
     button, input { font: inherit; }
 
     .page {
-      width: min(100%, 1160px);
+      width: min(100%, 1500px);
       margin: 0 auto;
+    }
+
+    .is-embedded body {
+      min-height: 0;
+      padding: 12px;
+      background: transparent;
+    }
+
+    .is-embedded .page {
+      width: 100%;
+      max-width: none;
+    }
+
+    .is-embedded header,
+    .is-embedded .intro,
+    .is-embedded footer {
+      display: none;
     }
 
     .workspace {
       display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(420px, 0.95fr);
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
       align-items: start;
       gap: 20px;
     }
@@ -141,44 +163,55 @@
 
     .palette-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 9px;
     }
 
     .palette-color {
       min-width: 0;
-      padding: 9px;
+      padding: 7px;
       border: 1px solid #e9e6df;
-      border-radius: 14px;
+      border-radius: 13px;
       background: #fff;
+      transition: border-color 140ms ease, box-shadow 140ms ease;
     }
 
     .palette-chip {
-      min-height: 135px;
-      border-radius: 9px;
+      min-height: clamp(110px, 14vw, 190px);
+      border-radius: 8px;
     }
 
     .palette-color.is-locked {
-      border-color: #928d7f;
+      border-color: #817b6b;
       box-shadow: 0 0 0 2px #e9e6df;
     }
 
     .palette-actions {
       display: flex;
-      gap: 6px;
-      margin-top: 10px;
+      justify-content: flex-end;
+      gap: 2px;
+      margin-top: 8px;
     }
 
     .palette-action {
-      flex: 1;
-      min-width: 0;
-      padding: 7px 4px;
+      display: grid;
+      width: 22px;
+      height: 26px;
+      flex: 0 0 22px;
+      place-items: center;
+      padding: 0;
       border: 1px solid #e3e0d9;
       border-radius: 7px;
       background: #fff;
-      color: #55544e;
-      font-size: 10px;
+      color: #77766f;
       cursor: pointer;
+      transition: color 120ms ease, background 120ms ease, border-color 120ms ease;
+    }
+
+    .palette-action:hover {
+      border-color: #c9c5bb;
+      background: #f6f4ef;
+      color: #252522;
     }
 
     .palette-action[aria-pressed="true"] {
@@ -187,27 +220,37 @@
       color: #252522;
     }
 
+    .palette-action:focus-visible {
+      outline: 2px solid #817b6b;
+      outline-offset: 2px;
+    }
+
     .palette-action:disabled {
       opacity: 0.42;
       cursor: not-allowed;
     }
 
+    .palette-action svg { width: 15px; height: 15px; }
+
     .palette-name {
-      margin: 12px 2px 5px;
+      min-height: 2.4em;
+      margin: 8px 1px 3px;
       color: #77766f;
-      font-size: 11px;
+      font-size: 10px;
+      line-height: 1.2;
     }
 
     .palette-hex {
-      margin: 0 2px 2px;
+      margin: 0 1px 2px;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 12px;
-      letter-spacing: 0.025em;
+      font-size: clamp(9px, 0.75vw, 11px);
+      letter-spacing: 0;
+      white-space: nowrap;
     }
 
     .studio-card {
       min-width: 0;
-      padding: 14px;
+      padding: 22px;
       border: 1px solid #e6e3dc;
       border-radius: 22px;
       background: #fbfaf7;
@@ -215,8 +258,8 @@
     }
 
     .swatch {
-      min-height: 150px;
-      border-radius: 13px;
+      min-height: 230px;
+      border-radius: 15px;
       background: #b9cec3;
       transition: background-color 120ms ease;
     }
@@ -247,59 +290,6 @@
       border-color: #cbc8c0;
       background: #f6f4ef;
     }
-
-    .vibe-panel {
-      display: grid;
-      gap: 9px;
-      margin: 2px 8px 20px;
-      padding: 17px 0 20px;
-      border-bottom: 1px solid #e9e6df;
-    }
-
-    .vibe-panel textarea {
-      width: 100%;
-      min-height: 58px;
-      resize: vertical;
-      padding: 10px 12px;
-      border: 1px solid #e3e0d9;
-      border-radius: 9px;
-      outline: none;
-      background: #fff;
-      color: #252522;
-      font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
-    }
-
-    .vibe-panel textarea:focus {
-      border-color: #aaa79d;
-      box-shadow: 0 0 0 3px rgb(150 145 132 / 12%);
-    }
-
-    .vibe-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .vibe-hint {
-      color: #929087;
-      font-size: 10px;
-      line-height: 1.4;
-    }
-
-    .vibe-button {
-      flex: 0 0 auto;
-      min-height: 34px;
-      padding: 0 11px;
-      border: 1px solid #292925;
-      border-radius: 8px;
-      background: #292925;
-      color: #fff;
-      font-size: 11px;
-      cursor: pointer;
-    }
-
-    .vibe-button:hover { background: #45453f; }
 
     .editor {
       display: grid;
@@ -520,13 +510,15 @@
 
     footer { padding: 22px 0; color: #929087; font-size: 12px; }
 
-    @media (max-width: 950px) {
+    @media (max-width: 1300px) {
       .workspace { grid-template-columns: 1fr; }
+      .palette-chip { min-height: clamp(130px, 22vw, 210px); }
     }
 
     @media (max-width: 650px) {
       body { padding: 20px; }
       header { padding-bottom: 36px; }
+      .studio-card { padding: 16px; }
       .swatch { min-height: 220px; }
       .editor { grid-template-columns: 1fr; gap: 26px; }
       .palette-section { padding: 16px; }
@@ -571,15 +563,6 @@
       <div class="swatch-caption">
         <p>Current color</p>
         <button class="random-button" id="random-color" type="button">Generate random color</button>
-      </div>
-
-      <div class="vibe-panel">
-        <label class="eyebrow" for="vibe-prompt">Describe the vibe</label>
-        <textarea id="vibe-prompt" rows="2" placeholder="neutral Nantucket beach vacation"></textarea>
-        <div class="vibe-footer">
-          <span class="vibe-hint">Try coastal, earthy, sunset, garden, or neutral.</span>
-          <button class="vibe-button" id="apply-vibe" type="button">Create palette</button>
-        </div>
       </div>
 
       <div class="editor">
@@ -653,7 +636,6 @@
     const modeButtons = document.querySelectorAll(".mode-button");
     const valueFields = document.querySelectorAll(".value-fields");
     const paletteGrid = document.querySelector("#palette-grid");
-    const vibeInput = document.querySelector("#vibe-prompt");
     const hueSlider = document.querySelector("#hue-slider");
     const saturationSlider = document.querySelector("#saturation-slider");
     const brightnessSlider = document.querySelector("#brightness-slider");
@@ -661,7 +643,6 @@
     let color = { r: 185, g: 206, b: 195 };
     let palette = [];
     const paletteRoles = ["Light neutral", "Dark neutral", "Deep anchor", "Quiet contrast", "Considered accent"];
-    let activeVibe = "";
 
     function rgbToHex(rgb) {
       return "#" + [rgb.r, rgb.g, rgb.b]
@@ -732,53 +713,14 @@
 
     const PALETTE_VARIATION_COUNT = 8;
 
-    function getVibeProfile(prompt) {
-      const words = prompt.toLowerCase();
-      const bold = /\b(bold|vibrant|dramatic|electric|punchy|saturated)\b/.test(words);
+    const balancedRecipes = {
+      light: [38, 13, 97],
+      dark: [30, 16, 30],
+      contrast: [218, 18, 74],
+      accent: [28, 32, 75]
+    };
 
-      if (/\b(nantucket|beach|coastal|coast|ocean|sea|shore|seaside|vacation|nautical)\b/.test(words)) {
-        return {
-          name: "Coastal",
-          light: [42, 12, 97], dark: [30, 18, 31],
-          contrast: [202, 22, 74], accent: [27, 36, 78], bold
-        };
-      }
-      if (/\b(earthy|earth|desert|clay|terracotta|forest|moss|mountain|wood|organic)\b/.test(words)) {
-        return {
-          name: "Earthy",
-          light: [39, 14, 95], dark: [25, 20, 29],
-          contrast: [94, 24, 62], accent: [20, 40, 68], bold
-        };
-      }
-      if (/\b(sunset|dusk|warm|golden|autumn|fall)\b/.test(words)) {
-        return {
-          name: "Warm dusk",
-          light: [35, 16, 96], dark: [12, 19, 30],
-          contrast: [8, 30, 73], accent: [38, 42, 79], bold
-        };
-      }
-      if (/\b(garden|botanical|spring|floral|leaf|meadow)\b/.test(words)) {
-        return {
-          name: "Garden",
-          light: [52, 13, 96], dark: [139, 16, 28],
-          contrast: [137, 25, 64], accent: [346, 32, 81], bold
-        };
-      }
-      if (/\b(neutral|minimal|quiet|editorial|modern|clean)\b/.test(words)) {
-        return {
-          name: "Quiet neutral",
-          light: [38, 11, 97], dark: [30, 13, 30],
-          contrast: [218, 17, 74], accent: [28, 30, 75], bold
-        };
-      }
-      return {
-        name: words ? "Studio" : "Balanced studio",
-        light: [38, 13, 97], dark: [30, 16, 30],
-        contrast: [218, 18, 74], accent: [28, 32, 75], bold
-      };
-    }
-
-    function varyColor(recipe, variation, role, bold = false) {
+    function varyColor(recipe, variation, role) {
       const hueAdjustments = [0, -5, 5, -10, 10, -16, 16, 2];
       const satAdjustments = [0, 3, -2, 5, -4, 2, -5, 4];
       const valueAdjustments = [0, 2, -2, 3, -3, -1, 1, -4];
@@ -788,8 +730,8 @@
 
       if (role === "neutral-light") saturation = Math.max(6, Math.min(18, saturation));
       if (role === "neutral-dark") saturation = Math.max(8, Math.min(24, saturation));
-      if (role === "support") saturation = Math.max(12, Math.min(bold ? 46 : 34, saturation));
-      if (role === "accent") saturation = Math.max(18, Math.min(bold ? 68 : 48, saturation));
+      if (role === "support") saturation = Math.max(12, Math.min(34, saturation));
+      if (role === "accent") saturation = Math.max(18, Math.min(48, saturation));
       brightness = Math.max(role === "neutral-dark" ? 20 : 28, Math.min(role === "neutral-light" ? 99 : 88, brightness));
       return hsvToRgb(hue, saturation, brightness);
     }
@@ -798,36 +740,32 @@
       const base = rgbToHsv(color);
       const baseHue = base.s < 3 ? 218 : base.h;
       const variant = variation % PALETTE_VARIATION_COUNT;
-      const profile = getVibeProfile(activeVibe);
       const anchorHueOffsets = [0, -5, 5, -10, 10, -16, 16, 2];
       let recipe;
       let role;
 
       if (index === 0) {
-        recipe = profile.light;
+        recipe = balancedRecipes.light;
         role = "neutral-light";
       } else if (index === 1) {
-        recipe = profile.dark;
+        recipe = balancedRecipes.dark;
         role = "neutral-dark";
       } else if (index === 2) {
-        const anchorSaturation = Math.min(profile.bold ? 60 : 42, Math.max(20, base.s * 0.52 + 8));
+        const anchorSaturation = Math.min(42, Math.max(20, base.s * 0.52 + 8));
         const anchorBrightness = Math.max(32, Math.min(48, base.v * 0.52));
         recipe = [(baseHue + anchorHueOffsets[variant] + 360) % 360, anchorSaturation, anchorBrightness];
         role = "anchor";
       } else if (index === 3) {
-        recipe = profile.bold
-          ? [profile.contrast[0], Math.min(50, profile.contrast[1] + 8), profile.contrast[2]]
-          : profile.contrast;
+        recipe = balancedRecipes.contrast;
         role = "support";
       } else {
-        recipe = profile.accent;
-        if (profile.bold) recipe = [recipe[0], Math.min(64, recipe[1] + 12), recipe[2]];
+        recipe = balancedRecipes.accent;
         role = "accent";
       }
 
       return {
         role: paletteRoles[index],
-        color: varyColor(recipe, variant, role, profile.bold),
+        color: varyColor(recipe, variant, role),
         variation: variant,
         locked: false
       };
@@ -852,21 +790,58 @@
     function renderPalette() {
       paletteGrid.innerHTML = palette.map((item, index) => {
         const hex = rgbToHex(item.color);
-        const lockText = item.locked ? "Locked" : "Keep";
-        const lockLabel = item.locked ? `Unlock ${item.role}` : `Keep ${item.role}`;
+        const lockLabel = item.locked ? `Unlock ${item.role}` : `Lock ${item.role}`;
+        const lockIcon = item.locked
+          ? '<path d="M7 10V7a5 5 0 0 1 10 0v3"/><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M12 14v3"/>'
+          : '<path d="M7 10V7a5 5 0 0 1 9.6-2"/><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M12 14v3"/>';
         return `
           <article class="palette-color${item.locked ? " is-locked" : ""}">
             <div class="palette-chip" style="background-color: ${hex}" aria-label="${item.role}, ${hex}"></div>
             <p class="palette-name">${item.role}</p>
             <p class="palette-hex">${hex}</p>
             <div class="palette-actions">
-              <button class="palette-action" type="button" data-action="lock" data-index="${index}" aria-label="${lockLabel}" aria-pressed="${item.locked}">${lockText}</button>
-              <button class="palette-action" type="button" data-action="refresh" data-index="${index}" aria-label="Regenerate ${item.role}" ${item.locked ? "disabled" : ""}>Refresh</button>
+              <button class="palette-action" type="button" data-action="lock" data-index="${index}" aria-label="${lockLabel}" aria-pressed="${item.locked}" title="${lockLabel}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${lockIcon}</svg>
+              </button>
+              <button class="palette-action" type="button" data-action="refresh" data-index="${index}" aria-label="Regenerate ${item.role}" title="Regenerate ${item.role}" ${item.locked ? "disabled" : ""}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 0 0-12-5L4 10M4 17v-5h5"/><path d="M5 12a7 7 0 0 0 12 5l3-3"/></svg>
+              </button>
+              <button class="palette-action" type="button" data-action="copy" data-index="${index}" aria-label="Copy ${item.role} HEX ${hex}" title="Copy ${hex}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>
+              </button>
             </div>
           </article>
         `;
       }).join("");
       document.querySelector("#refresh-unlocked").disabled = palette.every(item => item.locked);
+    }
+
+    async function copyPaletteHex(hex, role) {
+      let copied = false;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(hex);
+          copied = true;
+        } catch {
+          // Use the local-page fallback if clipboard permission is unavailable.
+        }
+      }
+
+      if (!copied) {
+        const temporaryField = document.createElement("textarea");
+        temporaryField.value = hex;
+        temporaryField.style.position = "fixed";
+        temporaryField.style.opacity = "0";
+        document.body.appendChild(temporaryField);
+        temporaryField.select();
+        copied = document.execCommand("copy");
+        temporaryField.remove();
+      }
+
+      document.querySelector("#palette-status").textContent = copied
+        ? `Copied ${hex} for ${role}.`
+        : "Copy was unavailable. Select the HEX value and copy it manually.";
     }
 
     function regenerateUnlockedColors() {
@@ -888,16 +863,6 @@
       );
       renderPalette();
       document.querySelector("#palette-status").textContent = "New direction created; all colors are unlocked.";
-    }
-
-    function applyVibe() {
-      activeVibe = vibeInput.value.trim();
-      palette = palette.map((item, index) =>
-        item.locked ? item : createPaletteColor(index, chooseDifferentVariation(item.variation))
-      );
-      renderPalette();
-      const profile = getVibeProfile(activeVibe);
-      document.querySelector("#palette-status").textContent = `Using the ${profile.name} recipe. Locked colors were kept.`;
     }
 
     function exportPaletteSVG() {
@@ -1066,16 +1031,14 @@
       } else if (button.dataset.action === "refresh" && !item.locked) {
         palette[index] = createPaletteColor(index, (item.variation + 1) % PALETTE_VARIATION_COUNT);
         renderPalette();
+      } else if (button.dataset.action === "copy") {
+        copyPaletteHex(rgbToHex(item.color), item.role);
       }
     });
 
     document.querySelector("#refresh-unlocked").addEventListener("click", regenerateUnlockedColors);
     document.querySelector("#new-direction").addEventListener("click", startNewDirection);
     document.querySelector("#export-svg").addEventListener("click", exportPaletteSVG);
-    document.querySelector("#apply-vibe").addEventListener("click", applyVibe);
-    vibeInput.addEventListener("keydown", event => {
-      if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) applyVibe();
-    });
     document.querySelector("#apply-color").addEventListener("click", applyEnteredColor);
     document.querySelector("#copy-hex").addEventListener("click", copyHex);
     document.querySelector("#random-color").addEventListener("click", () => {
